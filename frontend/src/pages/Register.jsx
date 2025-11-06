@@ -1,10 +1,10 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import axios from 'axios'
 import { useNavigate, Link } from 'react-router-dom'
 import { API_URL, useAuth } from '../hooks/useAuth.jsx'
 import Button from '../components/ui/Button.jsx'
 import Input from '../components/ui/Input.jsx'
-import { useEffect, useState as useSt } from 'react'
+import Card from '../components/ui/Card.jsx'
 
 export default function Register() {
   const [name, setName] = useState('')
@@ -15,7 +15,7 @@ export default function Register() {
   const [debug, setDebug] = useState(null)
   const { setToken, setUser } = useAuth()
   const navigate = useNavigate()
-  const [health, setHealth] = useSt('checking') // checking | ok | fail
+  const [health, setHealth] = useState('checking') // checking | ok | fail
 
   useEffect(() => {
     fetch(`${API_URL}/api/health`).then(r => r.ok ? setHealth('ok') : setHealth('fail')).catch(()=> setHealth('fail'))
