@@ -114,10 +114,17 @@ export default function AdminPrograms() {
           }
         }}>
           <Input 
-            label="Title" 
+            label="Titre"
+            icon="📝"
             value={editingId ? editTitle : title} 
             onChange={(e) => editingId ? setEditTitle(e.target.value) : setTitle(e.target.value)} 
-            required 
+            required
+            validation={(value) => {
+              if (!value || value.trim().length < 3) {
+                return { valid: false, message: 'Le titre doit contenir au moins 3 caractères' }
+              }
+              return { valid: true, message: 'Titre valide' }
+            }}
           />
           <label>
             Description du programme
@@ -144,18 +151,35 @@ export default function AdminPrograms() {
             />
           </label>
           <Input 
-            label="Duration (days)" 
+            label="Durée (jours)"
+            icon="📅"
             value={editingId ? editDuration : duration} 
             onChange={(e) => editingId ? setEditDuration(e.target.value) : setDuration(e.target.value)} 
             type="number" 
-            min="1" 
+            min="1"
+            validation={(value) => {
+              if (value && (isNaN(parseInt(value)) || parseInt(value) < 1)) {
+                return { valid: false, message: 'La durée doit être d\'au moins 1 jour' }
+              }
+              return null
+            }}
           />
           <Input 
-            label="Image URL" 
+            label="URL de l'image"
+            icon="🖼️"
             value={editingId ? editImageUrl : imageUrl} 
             onChange={(e) => editingId ? setEditImageUrl(e.target.value) : setImageUrl(e.target.value)} 
             type="url"
             placeholder="https://example.com/image.jpg"
+            validation={(value) => {
+              if (!value) return null
+              try {
+                new URL(value)
+                return { valid: true, message: 'URL valide' }
+              } catch {
+                return { valid: false, message: 'Format d\'URL invalide' }
+              }
+            }}
           />
           {(editingId ? editImageUrl : imageUrl) && (
             <div style={{ marginTop: '0.5rem' }}>

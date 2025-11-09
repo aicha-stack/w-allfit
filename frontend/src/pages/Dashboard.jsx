@@ -14,6 +14,7 @@ import NutritionSection from '../components/NutritionSection.jsx'
 import WorkoutSection from '../components/WorkoutSection.jsx'
 import PlannerSection from '../components/PlannerSection.jsx'
 import CommunitySection from '../components/CommunitySection.jsx'
+import DailyMoodTracker from '../components/DailyMoodTracker.jsx'
 
 export default function Dashboard() {
   const { token, user } = useAuth()
@@ -26,17 +27,28 @@ export default function Dashboard() {
   const [activeActivityTab, setActiveActivityTab] = useState('activity')
   const [favorites, setFavorites] = useState([])
   const [loadingFavorites, setLoadingFavorites] = useState(false)
+  const [todayStats, setTodayStats] = useState({
+    calories: 0,
+    workouts: 0,
+    progress: 0
+  })
+  const [loadingStats, setLoadingStats] = useState(false)
 
   useEffect(() => {
     if (token) {
       loadEnrollments()
-      if (activeActivityTab === 'favorites') {
-        loadFavorites()
-      }
+      loadFavorites() // Load favorites on mount for stats
+      loadTodayStats()
     } else {
       setLoading(false)
     }
-  }, [token, activeActivityTab])
+  }, [token])
+
+  useEffect(() => {
+    if (token && activeActivityTab === 'favorites' && favorites.length === 0) {
+      loadFavorites()
+    }
+  }, [activeActivityTab])
 
   const loadEnrollments = () => {
     setLoading(true)
@@ -45,6 +57,11 @@ export default function Dashboard() {
       .then(({ data }) => {
         console.log('Enrollments loaded:', data)
         setEnrollments(Array.isArray(data) ? data : [])
+        // Update stats after enrollments load
+        const progress = data.length > 0
+          ? Math.round(data.reduce((sum, e) => sum + (e.progress || 0), 0) / data.length)
+          : 0
+        setTodayStats(prev => ({ ...prev, workouts: data.length, progress }))
       })
       .catch(err => {
         console.error('Failed to load enrollments:', err)
@@ -52,6 +69,26 @@ export default function Dashboard() {
         setEnrollments([])
       })
       .finally(() => setLoading(false))
+  }
+
+  const loadTodayStats = async () => {
+    if (!token) return
+    setLoadingStats(true)
+    try {
+      // Load today's nutrition
+      const nutritionRes = await axios.get(`${API_URL}/api/nutrition/today`, {
+        headers: apiHeaders(token)
+      }).catch(() => ({ data: { calories: 0 } }))
+      
+      setTodayStats(prev => ({
+        ...prev,
+        calories: nutritionRes.data?.calories || 0
+      }))
+    } catch (err) {
+      console.error('Failed to load stats:', err)
+    } finally {
+      setLoadingStats(false)
+    }
   }
 
   const updateProgress = async (programId, currentProgress) => {
@@ -89,7 +126,7 @@ export default function Dashboard() {
     if (!token) return
     setLoadingFavorites(true)
     try {
-      const { data } = await axios.get(`${API_URL}/api/favorites`, { headers: apiHeaders(token) })
+      const { data } = await axios.get(`${API_URL}/api/favorites`, { headers: apiHeaders(token) }).catch(() => ({ data: [] }))
       setFavorites(Array.isArray(data) ? data : [])
     } catch (err) {
       console.error('Failed to load favorites:', err)
@@ -150,33 +187,20 @@ export default function Dashboard() {
           <div>
             <h2 style={{ 
               marginBottom: '0.25rem',
-              display: 'flex',
-              alignItems: 'center',
-              gap: '0.5rem',
               fontSize: '1.75rem'
             }}>
-              <span className="emoji-medium">{currentTabInfo.icon}</span>
-              <span>{currentTabInfo.title}</span>
+              {currentTabInfo.title}
             </h2>
             <p style={{ 
               color: 'var(--text-secondary)', 
               marginBottom: 0,
               fontSize: '0.95rem',
-              fontWeight: 400,
-              display: 'flex',
-              alignItems: 'center',
-              gap: '0.5rem'
+              fontWeight: 400
             }}>
               {activeMainTab === 'dashboard' ? (
-                <>
-                  <span className="emoji">👋</span>
-                  <span>Hey{user ? `, ${user.name}` : ''}! <span className="emoji"></span> Your Fitness Hub: Everything You Need at a Glance</span>
-                </>
+                <>Hey{user ? `, ${user.name}` : ''}! Your Fitness Hub: Everything You Need at a Glance</>
               ) : (
-                <>
-                  <span className="emoji">{currentTabInfo.icon}</span>
-                  <span>{currentTabInfo.subtitle}</span>
-                </>
+                <>{currentTabInfo.subtitle}</>
               )}
             </p>
           </div>
@@ -191,8 +215,12 @@ export default function Dashboard() {
           paddingBottom: '0.75rem',
           overflowX: 'auto',
           scrollbarWidth: 'none',
-          msOverflowStyle: 'none'
-        }}>
+          msOverflowStyle: 'none',
+          WebkitOverflowScrolling: 'touch',
+          paddingRight: '1rem'
+        }}
+        className="tab-scroll"
+        >
           {[
             { name: 'Dashboard' },
             { name: 'Workout' },
@@ -236,8 +264,7 @@ export default function Dashboard() {
                   }
                 }}
               >
-                <span className="emoji">{tab.icon}</span>
-                <span>{tab.name}</span>
+                {tab.name}
               </button>
             )
           })}
@@ -247,13 +274,135 @@ export default function Dashboard() {
       {/* Main Content Area - Only show on Dashboard tab */}
       {activeMainTab === 'dashboard' && (
         <>
+          {/* Daily Mood Tracker */}
+          <DailyMoodTracker />
+
+          {/* Quick Stats Cards */}
+          <div style={{ 
+            display: 'grid', 
+            gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', 
+            gap: '1rem', 
+            marginBottom: '1.5rem' 
+          }}>
+            <Card style={{ 
+              background: 'var(--gradient-purple)', 
+              color: 'white',
+              border: 'none',
+              padding: '1.25rem',
+              textAlign: 'center'
+            }}>
+              <div style={{ fontSize: '1.5rem', fontWeight: '700', marginBottom: '0.25rem' }}>
+                {loadingStats ? '...' : todayStats.calories}
+              </div>
+              <div style={{ fontSize: '0.875rem', opacity: 0.9 }}>Calories Today</div>
+            </Card>
+            
+            <Card style={{ 
+              background: 'var(--gradient-pink)', 
+              color: 'white',
+              border: 'none',
+              padding: '1.25rem',
+              textAlign: 'center'
+            }}>
+              <div style={{ fontSize: '1.5rem', fontWeight: '700', marginBottom: '0.25rem' }}>
+                {loading ? '...' : todayStats.workouts}
+              </div>
+              <div style={{ fontSize: '0.875rem', opacity: 0.9 }}>Active Programs</div>
+            </Card>
+            
+            <Card style={{ 
+              background: 'linear-gradient(135deg, #22c55e 0%, #10b981 100%)', 
+              color: 'white',
+              border: 'none',
+              padding: '1.25rem',
+              textAlign: 'center'
+            }}>
+              <div style={{ fontSize: '1.5rem', fontWeight: '700', marginBottom: '0.25rem' }}>
+                {loading ? '...' : `${todayStats.progress}%`}
+              </div>
+              <div style={{ fontSize: '0.875rem', opacity: 0.9 }}>Overall Progress</div>
+            </Card>
+            
+            <Card style={{ 
+              background: 'linear-gradient(135deg, #3b82f6 0%, #2563eb 100%)', 
+              color: 'white',
+              border: 'none',
+              padding: '1.25rem',
+              textAlign: 'center'
+            }}>
+              <div style={{ fontSize: '1.5rem', fontWeight: '700', marginBottom: '0.25rem' }}>
+                {loadingFavorites ? '...' : favorites.length}
+              </div>
+              <div style={{ fontSize: '0.875rem', opacity: 0.9 }}>Favorites</div>
+            </Card>
+          </div>
+
+          {/* Quick Actions */}
+          <Card style={{ 
+            marginBottom: '1.5rem', 
+            background: 'var(--card-soft)',
+            border: '1.5px solid var(--border)'
+          }}>
+            <h4 style={{ marginBottom: '1rem' }}>
+              Quick Actions
+            </h4>
+            <div style={{ 
+              display: 'grid', 
+              gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))', 
+              gap: '0.75rem' 
+            }}>
+              <Button 
+                onClick={() => setActiveMainTab('nutrition')}
+                style={{ 
+                  padding: '0.875rem 1rem',
+                  background: 'var(--gradient-purple)',
+                  border: 'none'
+                }}
+              >
+                Log Meal
+              </Button>
+              <Button 
+                onClick={() => setActiveMainTab('workout')}
+                style={{ 
+                  padding: '0.875rem 1rem',
+                  background: 'var(--gradient-pink)',
+                  border: 'none'
+                }}
+              >
+                Start Workout
+              </Button>
+              <Button 
+                onClick={() => setActiveMainTab('planner')}
+                style={{ 
+                  padding: '0.875rem 1rem',
+                  background: 'linear-gradient(135deg, #22c55e 0%, #10b981 100%)',
+                  border: 'none'
+                }}
+              >
+                Plan Week
+              </Button>
+              <Link to="/programs" style={{ textDecoration: 'none' }}>
+                <Button style={{ 
+                  width: '100%',
+                  padding: '0.875rem 1rem',
+                  background: 'linear-gradient(135deg, #3b82f6 0%, #2563eb 100%)',
+                  border: 'none'
+                }}>
+                  Browse Programs
+                </Button>
+              </Link>
+            </div>
+          </Card>
+
           {/* Top Section: Nutrition & Weekly Planner */}
           <div style={{ 
             display: 'grid', 
-            gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', 
+            gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', 
             gap: '1.5rem', 
             marginBottom: '1.5rem' 
-          }}>
+          }}
+          className="dashboard-grid"
+          >
             {/* Nutrition Tracker */}
             <NutritionTracker />
             
@@ -264,10 +413,12 @@ export default function Dashboard() {
           {/* Today's Workout and Activity Section */}
           <div style={{ 
             display: 'grid', 
-            gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', 
+            gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', 
             gap: '1.5rem', 
             marginBottom: '1.5rem' 
-          }}>
+          }}
+          className="dashboard-grid"
+          >
             {/* Today's Workout */}
             <TodayWorkout />
             
@@ -405,7 +556,6 @@ export default function Dashboard() {
                       textAlign: 'center',
                       color: 'var(--text-secondary)'
                     }}>
-                      <div style={{ fontSize: '2rem', marginBottom: '0.5rem' }}>💪</div>
                       <p style={{ fontWeight: '600', marginBottom: '0.25rem' }}>Glu'Core</p>
                       <small>No active program yet</small>
                       <div style={{ marginTop: '1rem' }}>
@@ -422,7 +572,7 @@ export default function Dashboard() {
               
                   {activeActivityTab === 'favorites' && (
                     <div>
-                      <h4 style={{ marginBottom: '1rem', color: 'var(--fg)' }}>⭐ My Favorites</h4>
+                      <h4 style={{ marginBottom: '1rem', color: 'var(--fg)' }}>My Favorites</h4>
                       {loadingFavorites ? (
                         <div className="note" style={{ textAlign: 'center', padding: '2rem' }}>
                           Loading favorites...
@@ -478,7 +628,7 @@ export default function Dashboard() {
                                 }}
                                 title="Remove from favorites"
                               >
-                                ⭐
+                                ×
                               </button>
                               <Link to={`/programs/${fav.program_id}`} style={{ textDecoration: 'none' }}>
                                 <ProgramImage
@@ -505,7 +655,7 @@ export default function Dashboard() {
                                 )}
                                 {fav.duration && (
                                   <small style={{ color: 'var(--text-secondary)', display: 'block', marginBottom: '0.5rem' }}>
-                                    📅 {fav.duration} days
+                                    {fav.duration} days
                                   </small>
                                 )}
                               </Link>
@@ -514,7 +664,6 @@ export default function Dashboard() {
                         </div>
                       ) : (
                         <div style={{ padding: '2rem', textAlign: 'center' }}>
-                          <div style={{ fontSize: '3rem', marginBottom: '1rem' }}>⭐</div>
                           <p style={{ color: 'var(--text-secondary)', marginBottom: '1rem' }}>
                             Your favorite programs will appear here
                           </p>

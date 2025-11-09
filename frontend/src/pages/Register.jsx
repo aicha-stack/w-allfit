@@ -4,6 +4,7 @@ import { useNavigate, Link } from 'react-router-dom'
 import { API_URL, useAuth } from '../hooks/useAuth.jsx'
 import Button from '../components/ui/Button.jsx'
 import Input from '../components/ui/Input.jsx'
+import PasswordStrength from '../components/ui/PasswordStrength.jsx'
 import Card from '../components/ui/Card.jsx'
 
 export default function Register() {
@@ -18,7 +19,20 @@ export default function Register() {
   const [health, setHealth] = useState('checking') // checking | ok | fail
 
   useEffect(() => {
-    fetch(`${API_URL}/api/health`).then(r => r.ok ? setHealth('ok') : setHealth('fail')).catch(()=> setHealth('fail'))
+    console.log("🔍 Register page - API URL check:");
+    console.log("  API_URL:", API_URL);
+    console.log("  VITE_API_URL from env:", import.meta.env.VITE_API_URL);
+    console.log("  Health check URL:", `${API_URL}/api/health`);
+    
+    fetch(`${API_URL}/api/health`)
+      .then(r => {
+        console.log("  Health check response status:", r.status);
+        return r.ok ? setHealth('ok') : setHealth('fail')
+      })
+      .catch((err) => {
+        console.error("  Health check failed:", err);
+        setHealth('fail')
+      })
   }, [])
 
   const onSubmit = async (e) => {
@@ -26,6 +40,11 @@ export default function Register() {
     setError('')
     setDebug(null)
     try {
+      console.log("🔍 Register attempt:");
+      console.log("  API_URL:", API_URL);
+      console.log("  Register URL:", `${API_URL}/api/users/register`);
+      console.log("  Login URL:", `${API_URL}/api/users/login`);
+      
       setStep('registering')
       await axios.post(`${API_URL}/api/users/register`, { name, email, password })
       setStep('logging')
@@ -73,13 +92,66 @@ export default function Register() {
         
         {health !== 'ok' && (
           <div className="error" style={{ 
-            display: 'flex', 
-            alignItems: 'center', 
-            gap: '0.5rem',
-            marginBottom: '1rem'
+            marginBottom: '1rem',
+            padding: '1rem',
+            borderRadius: '12px'
           }}>
-            <span className="emoji">⚠️</span>
-            <span>Backend not reachable. Check VITE_API_URL and backend server.</span>
+            <div style={{ display: 'flex', alignItems: 'flex-start', gap: '0.75rem', marginBottom: '0.75rem' }}>
+              <span className="emoji" style={{ fontSize: '1.5rem' }}>⚠️</span>
+              <div style={{ flex: 1 }}>
+                <strong style={{ display: 'block', marginBottom: '0.5rem' }}>
+                  Backend Server Not Reachable
+                </strong>
+                <div style={{ fontSize: '0.9rem', lineHeight: '1.6', marginBottom: '0.75rem' }}>
+                  <p style={{ margin: '0 0 0.5rem 0' }}>
+                    Cannot connect to backend at: <code style={{ 
+                      background: 'rgba(0,0,0,0.2)', 
+                      padding: '0.2rem 0.4rem', 
+                      borderRadius: '4px',
+                      fontSize: '0.85rem'
+                    }}>{API_URL}</code>
+                  </p>
+                  <p style={{ margin: '0.5rem 0', fontWeight: '600' }}>To fix this:</p>
+                  <ol style={{ margin: '0.5rem 0 0 1.5rem', padding: 0 }}>
+                    <li style={{ marginBottom: '0.25rem' }}>
+                      Make sure the backend server is running:
+                      <code style={{ 
+                        background: 'rgba(0,0,0,0.2)', 
+                        padding: '0.1rem 0.3rem', 
+                        borderRadius: '4px',
+                        fontSize: '0.8rem',
+                        marginLeft: '0.5rem'
+                      }}>cd backend && npm run dev</code>
+                    </li>
+                    <li style={{ marginBottom: '0.25rem' }}>
+                      Check that <code style={{ 
+                        background: 'rgba(0,0,0,0.2)', 
+                        padding: '0.1rem 0.3rem', 
+                        borderRadius: '4px',
+                        fontSize: '0.8rem'
+                      }}>VITE_API_URL</code> in <code style={{ 
+                        background: 'rgba(0,0,0,0.2)', 
+                        padding: '0.1rem 0.3rem', 
+                        borderRadius: '4px',
+                        fontSize: '0.8rem'
+                      }}>frontend/.env</code> matches your backend URL
+                    </li>
+                    <li style={{ marginBottom: '0.25rem' }}>
+                      Verify the backend is accessible at the URL above
+                    </li>
+                  </ol>
+                </div>
+              </div>
+            </div>
+            {health === 'checking' && (
+              <div style={{ 
+                fontSize: '0.85rem', 
+                color: 'var(--text-secondary)',
+                fontStyle: 'italic'
+              }}>
+                Checking connection...
+              </div>
+            )}
           </div>
         )}
         
@@ -96,28 +168,72 @@ export default function Register() {
             </div>
           )}
           <Input 
-            label={<><span className="emoji">👤</span> Name</>} 
+            label="Nom complet"
+            icon="👤"
             value={name} 
             onChange={(e)=>setName(e.target.value)} 
             required 
-            placeholder="Your full name"
+            placeholder="Votre nom complet"
+            validation={(value) => {
+              if (!value || value.trim().length < 2) {
+                return { valid: false, message: 'Le nom doit contenir au moins 2 caractères' }
+              }
+              if (value.trim().length > 120) {
+                return { valid: false, message: 'Le nom ne peut pas dépasser 120 caractères' }
+              }
+              return { valid: true, message: 'Nom valide' }
+            }}
           />
           <Input 
-            label={<><span className="emoji">📧</span> Email</>} 
+            label="Email"
+            icon="📧"
             value={email} 
             onChange={(e)=>setEmail(e.target.value)} 
             type="email" 
             required 
-            placeholder="your.email@example.com"
+            placeholder="votre.email@exemple.com"
+            validation={(value) => {
+              if (!value) {
+                return { valid: false, message: 'L\'email est requis' }
+              }
+              const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+              if (!emailRegex.test(value)) {
+                return { valid: false, message: 'Format d\'email invalide' }
+              }
+              return { valid: true, message: 'Email valide' }
+            }}
           />
           <Input 
-            label={<><span className="emoji">🔒</span> Password</>} 
+            label="Mot de passe"
+            icon="🔒"
             value={password} 
             onChange={(e)=>setPassword(e.target.value)} 
             type="password" 
             required 
-            placeholder="Create a strong password"
+            placeholder="Créez un mot de passe fort"
+            showPasswordToggle={true}
+            validation={(value) => {
+              if (!value) {
+                return { valid: false, message: 'Le mot de passe est requis' }
+              }
+              if (value.length < 8) {
+                return { valid: false, message: 'Le mot de passe doit contenir au moins 8 caractères' }
+              }
+              if (value.length >= 8 && value.length < 12) {
+                return { valid: true, message: 'Mot de passe acceptable' }
+              }
+              const hasUpper = /[A-Z]/.test(value)
+              const hasLower = /[a-z]/.test(value)
+              const hasNumber = /[0-9]/.test(value)
+              const hasSpecial = /[^A-Za-z0-9]/.test(value)
+              
+              if (hasUpper && hasLower && hasNumber && hasSpecial) {
+                return { valid: true, message: 'Mot de passe très fort' }
+              }
+              return { valid: true, message: 'Mot de passe valide' }
+            }}
           />
+          {password && <PasswordStrength password={password} />}
           <Button 
             type="submit" 
             disabled={step === 'registering' || step === 'logging'}

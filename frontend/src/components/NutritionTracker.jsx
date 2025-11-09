@@ -102,41 +102,99 @@ export default function NutritionTracker() {
       )}
 
       {editing ? (
-        <div className="form">
+        <div className="form" style={{ 
+          padding: '1.5rem',
+          background: 'var(--card)',
+          borderRadius: '12px',
+          border: '1px solid var(--border)'
+        }}>
+          <h4 style={{ marginBottom: '1.5rem', color: 'var(--fg)', fontSize: '1.1rem' }}>Modifier les valeurs nutritionnelles</h4>
           <Input 
-            label="Calories" 
+            label="Calories"
             type="number"
             value={calories} 
-            onChange={(e) => setCalories(e.target.value)} 
+            onChange={(e) => setCalories(e.target.value)}
+            placeholder="0"
+            validation={(value) => {
+              const num = parseInt(value)
+              if (value && (isNaN(num) || num < 0)) {
+                return { valid: false, message: 'Veuillez entrer un nombre positif' }
+              }
+              return null
+            }}
           />
           <Input 
-            label="Protéines (g)" 
+            label="Protéines (g)"
             type="number"
             value={protein} 
-            onChange={(e) => setProtein(e.target.value)} 
+            onChange={(e) => setProtein(e.target.value)}
+            placeholder="0"
+            validation={(value) => {
+              const num = parseInt(value)
+              if (value && (isNaN(num) || num < 0)) {
+                return { valid: false, message: 'Veuillez entrer un nombre positif' }
+              }
+              return null
+            }}
           />
           <Input 
-            label="Glucides (g)" 
+            label="Glucides (g)"
             type="number"
             value={carbs} 
-            onChange={(e) => setCarbs(e.target.value)} 
+            onChange={(e) => setCarbs(e.target.value)}
+            placeholder="0"
+            validation={(value) => {
+              const num = parseInt(value)
+              if (value && (isNaN(num) || num < 0)) {
+                return { valid: false, message: 'Veuillez entrer un nombre positif' }
+              }
+              return null
+            }}
           />
           <Input 
-            label="Lipides (g)" 
+            label="Lipides (g)"
             type="number"
             value={fat} 
-            onChange={(e) => setFat(e.target.value)} 
+            onChange={(e) => setFat(e.target.value)}
+            placeholder="0"
+            validation={(value) => {
+              const num = parseInt(value)
+              if (value && (isNaN(num) || num < 0)) {
+                return { valid: false, message: 'Veuillez entrer un nombre positif' }
+              }
+              return null
+            }}
           />
-          <div style={{ display: 'flex', gap: '0.5rem', marginTop: '0.5rem' }}>
-            <Button onClick={handleUpdate}>Enregistrer</Button>
-            <Button onClick={() => { setEditing(false); loadData(); }}>Annuler</Button>
+          <div style={{ display: 'flex', gap: '0.5rem', marginTop: '1rem' }}>
+            <Button onClick={handleUpdate} style={{ flex: 1 }}>Enregistrer</Button>
+            <Button 
+              onClick={() => { 
+                setEditing(false)
+                loadData()
+              }} 
+              style={{ 
+                flex: 1,
+                background: 'var(--card-soft)',
+                color: 'var(--fg)',
+                border: '1.5px solid var(--border)'
+              }}
+            >
+              Annuler
+            </Button>
           </div>
         </div>
       ) : (
         <>
-          <div style={{ display: 'flex', gap: '1rem', alignItems: 'flex-start' }}>
+          <div style={{ 
+            display: 'flex', 
+            gap: '1rem', 
+            alignItems: 'flex-start',
+            flexWrap: 'wrap'
+          }}
+          className="nutrition-layout"
+          >
             {/* Calories Circle */}
-            <div style={{ textAlign: 'center', flex: '0 0 auto' }}>
+            <div style={{ textAlign: 'center', flex: '0 0 auto', width: '100%' }} className="calories-circle-mobile">
               <div style={{ 
                 position: 'relative', 
                 width: '120px', 

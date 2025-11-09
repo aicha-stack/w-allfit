@@ -5,6 +5,7 @@ import Card from './ui/Card.jsx'
 import Button from './ui/Button.jsx'
 import Input from './ui/Input.jsx'
 import ProgramImage from './ui/ProgramImage.jsx'
+import RecipeModal from './ui/RecipeModal.jsx'
 
 export default function RecipesTab() {
   const { token } = useAuth()
@@ -12,6 +13,8 @@ export default function RecipesTab() {
   const [loading, setLoading] = useState(true)
   const [showAddForm, setShowAddForm] = useState(false)
   const [deletingId, setDeletingId] = useState(null)
+  const [selectedRecipeId, setSelectedRecipeId] = useState(null)
+  const [isModalOpen, setIsModalOpen] = useState(false)
   const [formData, setFormData] = useState({
     title: '',
     description: '',
@@ -160,10 +163,17 @@ export default function RecipesTab() {
           <h4 style={{ marginBottom: '1rem' }}>Create New Recipe</h4>
           <form onSubmit={handleSubmit} className="form">
             <Input
-              label="Recipe Title *"
+              label="Titre de la recette"
+              icon="🍽️"
               value={formData.title}
               onChange={(e) => setFormData({ ...formData, title: e.target.value })}
               required
+              validation={(value) => {
+                if (!value || value.trim().length < 3) {
+                  return { valid: false, message: 'Le titre doit contenir au moins 3 caractères' }
+                }
+                return { valid: true, message: 'Titre valide' }
+              }}
             />
             <label>
               Description
@@ -184,11 +194,21 @@ export default function RecipesTab() {
               />
             </label>
             <Input
-              label="Image URL"
+              label="URL de l'image"
+              icon="🖼️"
               type="url"
               value={formData.image_url}
               onChange={(e) => setFormData({ ...formData, image_url: e.target.value })}
               placeholder="https://example.com/image.jpg"
+              validation={(value) => {
+                if (!value) return null
+                try {
+                  new URL(value)
+                  return { valid: true, message: 'URL valide' }
+                } catch {
+                  return { valid: false, message: 'Format d\'URL invalide' }
+                }
+              }}
             />
             {formData.image_url && (
               <div style={{ marginBottom: '1rem' }}>
@@ -198,39 +218,81 @@ export default function RecipesTab() {
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '1rem' }}>
               <Input
                 label="Calories"
+                icon="🔥"
                 type="number"
                 value={formData.calories}
                 onChange={(e) => setFormData({ ...formData, calories: e.target.value })}
+                validation={(value) => {
+                  if (value && (isNaN(parseInt(value)) || parseInt(value) < 0)) {
+                    return { valid: false, message: 'Nombre positif requis' }
+                  }
+                  return null
+                }}
               />
               <Input
-                label="Prep Time (min)"
+                label="Temps de préparation (min)"
+                icon="⏱️"
                 type="number"
                 value={formData.prep_time}
                 onChange={(e) => setFormData({ ...formData, prep_time: e.target.value })}
+                validation={(value) => {
+                  if (value && (isNaN(parseInt(value)) || parseInt(value) < 0)) {
+                    return { valid: false, message: 'Nombre positif requis' }
+                  }
+                  return null
+                }}
               />
               <Input
-                label="Protein (g)"
+                label="Protéines (g)"
+                icon="🥩"
                 type="number"
                 value={formData.protein_g}
                 onChange={(e) => setFormData({ ...formData, protein_g: e.target.value })}
+                validation={(value) => {
+                  if (value && (isNaN(parseInt(value)) || parseInt(value) < 0)) {
+                    return { valid: false, message: 'Nombre positif requis' }
+                  }
+                  return null
+                }}
               />
               <Input
-                label="Carbs (g)"
+                label="Glucides (g)"
+                icon="🍞"
                 type="number"
                 value={formData.carbs_g}
                 onChange={(e) => setFormData({ ...formData, carbs_g: e.target.value })}
+                validation={(value) => {
+                  if (value && (isNaN(parseInt(value)) || parseInt(value) < 0)) {
+                    return { valid: false, message: 'Nombre positif requis' }
+                  }
+                  return null
+                }}
               />
               <Input
-                label="Fat (g)"
+                label="Lipides (g)"
+                icon="🥑"
                 type="number"
                 value={formData.fat_g}
                 onChange={(e) => setFormData({ ...formData, fat_g: e.target.value })}
+                validation={(value) => {
+                  if (value && (isNaN(parseInt(value)) || parseInt(value) < 0)) {
+                    return { valid: false, message: 'Nombre positif requis' }
+                  }
+                  return null
+                }}
               />
               <Input
-                label="Servings"
+                label="Portions"
+                icon="🍽️"
                 type="number"
                 value={formData.servings}
                 onChange={(e) => setFormData({ ...formData, servings: e.target.value })}
+                validation={(value) => {
+                  if (value && (isNaN(parseInt(value)) || parseInt(value) < 1)) {
+                    return { valid: false, message: 'Au moins 1 portion requise' }
+                  }
+                  return null
+                }}
               />
             </div>
             <label>
@@ -274,7 +336,8 @@ export default function RecipesTab() {
               />
             </label>
             <Input
-              label="Tags (comma separated)"
+              label="Tags (séparés par des virgules)"
+              icon="🏷️"
               value={formData.tags}
               onChange={(e) => setFormData({ ...formData, tags: e.target.value })}
               placeholder="breakfast, vegan, healthy"
@@ -377,8 +440,14 @@ export default function RecipesTab() {
                 </div>
               )}
               <div style={{ display: 'flex', gap: '0.5rem' }}>
-                <Button style={{ flex: '1', fontSize: '0.875rem' }}>
-                  View Recipe
+                <Button 
+                  style={{ flex: '1', fontSize: '0.875rem' }}
+                  onClick={() => {
+                    setSelectedRecipeId(recipe.id)
+                    setIsModalOpen(true)
+                  }}
+                >
+                  👁️ Voir la recette
                 </Button>
                 {recipe.user_id && (
                   <button
@@ -424,6 +493,17 @@ export default function RecipesTab() {
           <p style={{ color: 'var(--text-secondary)' }}>No recipes yet. Create your first recipe!</p>
         </Card>
       )}
+
+      {/* Recipe Modal */}
+      <RecipeModal
+        recipeId={selectedRecipeId}
+        recipe={recipes.find(r => r.id === selectedRecipeId)}
+        isOpen={isModalOpen}
+        onClose={() => {
+          setIsModalOpen(false)
+          setSelectedRecipeId(null)
+        }}
+      />
     </div>
   )
 }

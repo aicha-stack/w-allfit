@@ -41,7 +41,8 @@ export const getUserByEmail = async (email) => {
   const roleSelect = hasRole ? 'role' : "'user' as role";
   
   const result = await db.query(
-    `SELECT id, name, email, password, ${roleSelect}, created_at 
+    `SELECT id, name, email, password, ${roleSelect}, created_at,
+            weight, height, menstrual_cycle_start_date, menstrual_cycle_duration
      FROM users WHERE email = $1`,
     [email]
   );
@@ -53,24 +54,30 @@ export const getUserById = async (id) => {
   const roleSelect = hasRole ? 'role' : "'user' as role";
   
   const result = await db.query(
-    `SELECT id, name, email, ${roleSelect}, created_at 
+    `SELECT id, name, email, ${roleSelect}, created_at, 
+            weight, height, menstrual_cycle_start_date, menstrual_cycle_duration
      FROM users WHERE id = $1`, 
     [id]
   );
   return result.rows[0];
 };
 
-export const updateUser = async (id, { name, email }) => {
+export const updateUser = async (id, { name, email, weight, height, menstrual_cycle_start_date, menstrual_cycle_duration }) => {
   const hasRole = await roleColumnExists();
   const roleSelect = hasRole ? 'role' : "'user' as role";
   
   const result = await db.query(
     `UPDATE users 
      SET name = COALESCE($1, name),
-         email = COALESCE($2, email)
-     WHERE id = $3
-     RETURNING id, name, email, ${roleSelect}, created_at`,
-    [name, email, id]
+         email = COALESCE($2, email),
+         weight = COALESCE($3, weight),
+         height = COALESCE($4, height),
+         menstrual_cycle_start_date = COALESCE($5, menstrual_cycle_start_date),
+         menstrual_cycle_duration = COALESCE($6, menstrual_cycle_duration)
+     WHERE id = $7
+     RETURNING id, name, email, ${roleSelect}, created_at, 
+               weight, height, menstrual_cycle_start_date, menstrual_cycle_duration`,
+    [name, email, weight, height, menstrual_cycle_start_date, menstrual_cycle_duration, id]
   );
   if (result.rows.length === 0) throw new Error("Utilisateur non trouvé");
   return result.rows[0];

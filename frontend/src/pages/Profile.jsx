@@ -4,6 +4,7 @@ import { API_URL, apiHeaders, useAuth } from '../hooks/useAuth.jsx'
 import Button from '../components/ui/Button.jsx'
 import Input from '../components/ui/Input.jsx'
 import Card from '../components/ui/Card.jsx'
+import PersonalInfo from '../components/PersonalInfo.jsx'
 
 export default function Profile() {
   const { token, user, setUser } = useAuth()
@@ -20,7 +21,7 @@ export default function Profile() {
         .then(({ data }) => {
           setName(data.name || '')
           setEmail(data.email || '')
-          setUser(data)
+          setUser(data) // This will include weight, height, cycle info
         })
         .catch(err => setError(err.response?.data?.error || 'Failed to load profile'))
         .finally(() => setLoading(false))
@@ -98,19 +99,35 @@ export default function Profile() {
         
         <form onSubmit={handleSubmit} className="form">
           <Input 
-            label={<><span className="emoji">👤</span> Name</>} 
+            label="Nom complet"
+            icon="👤"
             value={name} 
             onChange={(e) => setName(e.target.value)} 
             required 
-            placeholder="Your full name"
+            placeholder="Votre nom complet"
+            validation={(value) => {
+              if (!value || value.trim().length < 2) {
+                return { valid: false, message: 'Le nom doit contenir au moins 2 caractères' }
+              }
+              return { valid: true, message: 'Nom valide' }
+            }}
           />
           <Input 
-            label={<><span className="emoji">📧</span> Email</>} 
+            label="Email"
+            icon="📧"
             type="email"
             value={email} 
             onChange={(e) => setEmail(e.target.value)} 
             required 
-            placeholder="your.email@example.com"
+            placeholder="votre.email@exemple.com"
+            validation={(value) => {
+              if (!value) return null
+              const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+              if (!emailRegex.test(value)) {
+                return { valid: false, message: 'Format d\'email invalide' }
+              }
+              return { valid: true, message: 'Email valide' }
+            }}
           />
           
           <div style={{ 
@@ -158,14 +175,15 @@ export default function Profile() {
           </div>
           
           <Button type="submit" disabled={saving} style={{ width: '100%', marginTop: '1.5rem' }}>
-            {saving ? (
-              <>⏳ Saving...</>
-            ) : (
-              <>💾 Update Profile</>
-            )}
+            {saving ? 'Enregistrement...' : 'Mettre à jour le profil'}
           </Button>
         </form>
       </Card>
+
+      {/* Personal Information Section */}
+      <div style={{ marginTop: '2rem' }}>
+        <PersonalInfo />
+      </div>
     </div>
   )
 }

@@ -117,7 +117,7 @@ export default function Programs() {
         <div style={{ position: 'relative' }}>
           <input
             type="text"
-            placeholder="Rechercher un programme (titre, description)..."
+            placeholder="Rechercher un programme..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             style={{
@@ -129,7 +129,8 @@ export default function Programs() {
               background: 'var(--card)',
               color: 'var(--fg)',
               boxSizing: 'border-box',
-              transition: 'all 0.3s ease'
+              transition: 'all 0.3s ease',
+              minHeight: '44px'
             }}
             onFocus={(e) => {
               e.target.style.borderColor = 'var(--brand)'

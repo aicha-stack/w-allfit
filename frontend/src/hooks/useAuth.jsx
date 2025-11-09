@@ -68,6 +68,30 @@ export function apiHeaders(token) {
   return token ? { Authorization: `Bearer ${token}` } : {}
 }
 
-export const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000'
+// Get API URL from environment variable
+const envApiUrl = import.meta.env.VITE_API_URL;
+const defaultApiUrl = 'http://localhost:5000';
+
+// Log API URL configuration for debugging
+console.log("🔍 API Configuration Debug:");
+console.log("  VITE_API_URL from env:", envApiUrl);
+console.log("  VITE_API_URL type:", typeof envApiUrl);
+console.log("  Default fallback:", defaultApiUrl);
+
+// Validate and set API_URL
+export const API_URL = envApiUrl || defaultApiUrl;
+
+// Warn if using default (means .env might be missing)
+if (!envApiUrl) {
+  console.warn("⚠️  VITE_API_URL not found in environment variables!");
+  console.warn("   Using default:", defaultApiUrl);
+  console.warn("   To fix: Create frontend/.env with: VITE_API_URL=http://localhost:5000");
+  console.warn("   Then restart the frontend server (npm run dev)");
+} else {
+  console.log("  ✅ VITE_API_URL is configured:", envApiUrl);
+}
+
+console.log("  Final API_URL:", API_URL);
+console.log("  API_URL will be used for all requests");
 
 

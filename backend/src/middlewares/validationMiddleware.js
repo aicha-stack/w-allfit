@@ -77,7 +77,7 @@ export const validateProgram = (req, res, next) => {
 };
 
 export const validateUpdateProfile = (req, res, next) => {
-  const { name, email } = req.body;
+  const { name, email, weight, height, menstrual_cycle_start_date, menstrual_cycle_duration } = req.body;
   const errors = [];
 
   if (name !== undefined) {
@@ -89,6 +89,27 @@ export const validateUpdateProfile = (req, res, next) => {
   if (email !== undefined) {
     if (typeof email !== 'string' || !email.includes('@')) {
       errors.push('Email invalide');
+    }
+  }
+
+  if (weight !== undefined && weight !== null) {
+    const weightNum = Number(weight);
+    if (isNaN(weightNum) || weightNum < 30 || weightNum > 200) {
+      errors.push('Le poids doit être entre 30 et 200 kg');
+    }
+  }
+
+  if (height !== undefined && height !== null) {
+    const heightNum = Number(height);
+    if (isNaN(heightNum) || heightNum < 100 || heightNum > 250) {
+      errors.push('La taille doit être entre 100 et 250 cm');
+    }
+  }
+
+  if (menstrual_cycle_duration !== undefined && menstrual_cycle_duration !== null) {
+    const durationNum = Number(menstrual_cycle_duration);
+    if (isNaN(durationNum) || durationNum < 21 || durationNum > 35) {
+      errors.push('La durée du cycle doit être entre 21 et 35 jours');
     }
   }
 

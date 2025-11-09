@@ -247,12 +247,26 @@ export default function WeeklyPlanner() {
 
   return (
     <Card style={{ background: 'var(--card-soft)' }}>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
+      <div style={{ 
+        display: 'flex', 
+        justifyContent: 'space-between', 
+        alignItems: 'center', 
+        marginBottom: '1.5rem',
+        flexWrap: 'wrap',
+        gap: '1rem'
+      }}>
         <h3 style={{ margin: 0, display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
           <span>📅</span>
           <span>Weekly Planner</span>
         </h3>
-        <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
+        <div style={{ 
+          display: 'flex', 
+          gap: '0.5rem', 
+          alignItems: 'center',
+          flexWrap: 'wrap'
+        }}
+        className="planner-controls"
+        >
           <button 
             onClick={prevWeek} 
             style={{ 
@@ -280,8 +294,11 @@ export default function WeeklyPlanner() {
             minWidth: '180px', 
             textAlign: 'center',
             fontWeight: '600',
-            color: 'var(--fg)'
-          }}>
+            color: 'var(--fg)',
+            flex: '1',
+          }}
+          className="planner-date-range"
+          >
             {monday.toLocaleDateString('fr-FR', { day: 'numeric', month: 'short' })} - {weekEnd.toLocaleDateString('fr-FR', { day: 'numeric', month: 'short' })}
           </small>
           <button 
@@ -311,7 +328,14 @@ export default function WeeklyPlanner() {
       </div>
 
       <div style={{ marginBottom: '1rem' }}>
-        <div style={{ display: 'flex', gap: '0.5rem', justifyContent: 'space-between' }}>
+        <div style={{ 
+          display: 'flex', 
+          gap: '0.5rem', 
+          justifyContent: 'space-between',
+          flexWrap: 'wrap'
+        }}
+        className="planner-days"
+        >
           {dayAbbr.map((abbr, index) => {
             const daySchedules = getDaySchedule(index)
             const hasScheduledWorkout = daySchedules.length > 0

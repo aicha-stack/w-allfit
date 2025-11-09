@@ -34,7 +34,47 @@
   --gradient-card-purple: linear-gradient(135deg, rgba(168,85,247,0.15) 0%, rgba(196,132,252,0.1) 100%);
 }
 
+/* Input Animations */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  10%, 30%, 50%, 70%, 90% { transform: translateX(-4px); }
+  20%, 40%, 60%, 80% { transform: translateX(4px); }
+}
+
+.input-field {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.input-field:focus {
+  transform: translateY(-1px);
+}
+
+.input-error {
+  animation: shake 0.4s ease-in-out;
+}
+
+.input-valid {
+  animation: fadeIn 0.3s ease;
+}
+
 * { box-sizing: border-box; }
+
+html {
+  -webkit-tap-highlight-color: transparent;
+  -webkit-touch-callout: none;
+}
+
 body { 
   margin: 0; 
   font-family: 'Inter', 'Segoe UI', -apple-system, BlinkMacSystemFont, 'Roboto', 'Helvetica Neue', Arial, sans-serif; 
@@ -43,12 +83,220 @@ body {
   line-height: 1.6;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  overflow-x: hidden;
+  -webkit-overflow-scrolling: touch;
 }
 .container { 
   max-width: 1200px; 
   margin: 2rem auto; 
   padding: 0 1.5rem; 
   animation: fadeIn .4s ease-out; 
+}
+
+/* Mobile Responsive */
+@media (max-width: 768px) {
+  .container {
+    margin: 1rem auto;
+    padding: 0 1rem;
+  }
+  
+  h1 {
+    font-size: clamp(1.5rem, 5vw, 2rem) !important;
+  }
+  
+  h2 {
+    font-size: clamp(1.25rem, 4vw, 1.75rem) !important;
+  }
+  
+  h3 {
+    font-size: clamp(1.1rem, 3.5vw, 1.3rem) !important;
+  }
+  
+  .card {
+    padding: 1rem;
+    border-radius: 16px;
+  }
+  
+  .btn {
+    padding: 0.75rem 1.5rem;
+    font-size: 0.9rem;
+    min-height: 44px; /* Touch-friendly */
+  }
+  
+  input {
+    padding: 0.875rem 1rem;
+    font-size: 0.95rem;
+    min-height: 44px; /* Touch-friendly */
+  }
+  
+  .grid {
+    grid-template-columns: 1fr !important;
+    gap: 1rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .container {
+    padding: 0 0.75rem;
+  }
+  
+  .card {
+    padding: 0.875rem;
+    border-radius: 12px;
+  }
+  
+  .btn {
+    padding: 0.7rem 1.25rem;
+    font-size: 0.875rem;
+  }
+}
+
+/* Dashboard specific mobile styles */
+@media (max-width: 768px) {
+  .dashboard-grid {
+    grid-template-columns: 1fr !important;
+  }
+  
+  .tab-scroll {
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+  }
+  
+  .tab-scroll::-webkit-scrollbar {
+    display: none;
+  }
+  
+  .tab-scroll button {
+    flex-shrink: 0;
+    min-width: fit-content;
+    padding: 0.6rem 1rem;
+    font-size: 0.875rem;
+  }
+}
+
+/* Touch-friendly interactions */
+@media (hover: none) and (pointer: coarse) {
+  .card:hover {
+    transform: none;
+  }
+  
+  .card:active {
+    transform: scale(0.98);
+  }
+  
+  button:active,
+  .btn:active {
+    transform: scale(0.95);
+  }
+  
+  a:active {
+    opacity: 0.7;
+  }
+}
+
+/* Nutrition Tracker Mobile */
+@media (max-width: 768px) {
+  .nutrition-layout {
+    flex-direction: column;
+  }
+  
+  .calories-circle-mobile {
+    width: 100% !important;
+    margin-bottom: 1rem;
+  }
+  
+  .calories-circle-mobile > div {
+    width: 100px !important;
+    height: 100px !important;
+  }
+  
+  .calories-circle-mobile svg {
+    width: 110px !important;
+    height: 110px !important;
+  }
+}
+
+/* Weekly Planner Mobile */
+@media (max-width: 768px) {
+  .planner-controls {
+    width: 100%;
+    justify-content: space-between;
+  }
+  
+  .planner-date-range {
+    order: -1;
+    width: 100%;
+    margin-bottom: 0.5rem;
+  }
+  
+  .planner-controls button {
+    min-width: 44px;
+    min-height: 44px;
+  }
+  
+  .planner-days > div {
+    min-width: calc(14% - 0.3rem);
+    flex: 1;
+    min-height: 60px;
+    padding: 0.5rem 0.25rem;
+  }
+  
+  .planner-days > div > div {
+    min-height: 44px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+}
+
+/* Programs page mobile */
+@media (max-width: 768px) {
+  input[type="text"],
+  input[type="email"],
+  input[type="password"],
+  input[type="number"],
+  textarea,
+  select {
+    font-size: 16px !important; /* Prevents zoom on iOS */
+  }
+  
+  /* Better touch targets */
+  button,
+  .btn,
+  a {
+    min-height: 44px;
+    min-width: 44px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  /* Improve card spacing on mobile */
+  .card + .card {
+    margin-top: 1rem;
+  }
+  
+  /* Better grid spacing */
+  .grid {
+    gap: 1rem !important;
+  }
+}
+
+/* Smooth scrolling for mobile */
+@media (max-width: 768px) {
+  * {
+    -webkit-overflow-scrolling: touch;
+  }
+  
+  /* Prevent text selection on buttons */
+  button,
+  .btn {
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+  }
 }
 .nav { 
   display: flex; 
@@ -60,9 +308,16 @@ body {
   top: 0; 
   background: rgba(15, 15, 15, 0.95);
   backdrop-filter: blur(10px);
-  z-index: 10; 
+  z-index: 100; 
   box-shadow: 0 2px 8px rgba(0,0,0,.3);
 }
+
+@media (max-width: 768px) {
+  .nav {
+    padding: 1rem;
+  }
+}
+
 .nav a { 
   margin-right: 1.5rem; 
   text-decoration: none; 
@@ -70,12 +325,32 @@ body {
   opacity: .85;
   transition: all 0.2s ease;
   font-weight: 500;
+  display: flex;
+  align-items: center;
+  padding: 0.5rem 0;
+  min-height: 44px; /* Touch-friendly */
 }
+
+@media (max-width: 768px) {
+  .nav a {
+    margin-right: 0;
+    padding: 0.75rem 0;
+  }
+}
+
 .nav a:hover { 
   opacity: 1; 
   color: var(--brand);
   transform: translateY(-1px);
 }
+
+@media (hover: none) {
+  .nav a:active {
+    opacity: 1;
+    color: var(--brand);
+  }
+}
+
 .brand { 
   font-weight: 800; 
   color: var(--brand) !important; 
@@ -85,6 +360,88 @@ body {
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
+}
+
+@media (max-width: 768px) {
+  .brand {
+    font-size: 1.1rem;
+  }
+}
+
+/* Mobile Menu Styles */
+.mobile-menu {
+  display: none;
+}
+
+@media (max-width: 768px) {
+  .mobile-menu {
+    display: block;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(15, 15, 15, 0.98);
+    backdrop-filter: blur(10px);
+    z-index: 99;
+    padding-top: 4rem;
+    animation: slideDown 0.3s ease-out;
+  }
+  
+  .mobile-menu-content {
+    padding: 1.5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+  }
+  
+  .mobile-menu a {
+    padding: 1rem;
+    border-bottom: 1px solid var(--border);
+    color: var(--fg);
+    text-decoration: none;
+    font-size: 1.1rem;
+    font-weight: 500;
+    transition: all 0.2s ease;
+    min-height: 48px;
+    display: flex;
+    align-items: center;
+  }
+  
+  .mobile-menu a:active {
+    background: var(--brand-light);
+    color: var(--brand);
+  }
+  
+  .mobile-menu-button {
+    background: transparent;
+    border: none;
+    color: var(--fg);
+    cursor: pointer;
+    padding: 0.5rem;
+    min-width: 44px;
+    min-height: 44px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 8px;
+    transition: all 0.2s ease;
+  }
+  
+  .mobile-menu-button:active {
+    background: var(--brand-light);
+  }
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 .btn { 
   background: var(--gradient-purple); 
@@ -365,5 +722,32 @@ h1 .emoji, h2 .emoji, h3 .emoji, h4 .emoji {
 .emoji-rotate {
   animation: emoji-rotate 3s linear infinite;
   display: inline-block;
+}
+
+/* Daily Mood Tracker Responsive */
+@media (max-width: 768px) {
+  .mood-selection-grid {
+    grid-template-columns: repeat(4, 1fr) !important;
+    gap: 0.5rem !important;
+  }
+  
+  .mood-selection-grid button {
+    min-width: 70px !important;
+    padding: 0.6rem 0.5rem !important;
+  }
+  
+  .mood-selection-grid button span:first-child {
+    font-size: 1.5rem !important;
+  }
+  
+  .mood-selection-grid button span:last-child {
+    font-size: 0.75rem !important;
+  }
+}
+
+@media (max-width: 480px) {
+  .mood-selection-grid {
+    grid-template-columns: repeat(4, 1fr) !important;
+  }
 }
 

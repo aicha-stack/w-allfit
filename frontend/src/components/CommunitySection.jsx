@@ -179,12 +179,22 @@ function FeedTab() {
               />
             </label>
             <Input
-              label="Image URL (optional)"
+              label="URL de l'image (optionnel)"
+              icon="🖼️"
               type="url"
               value={postImageUrl}
               onChange={(e) => setPostImageUrl(e.target.value)}
               placeholder="https://example.com/image.jpg"
               style={{ marginTop: '1rem' }}
+              validation={(value) => {
+                if (!value) return null
+                try {
+                  new URL(value)
+                  return { valid: true, message: 'URL valide' }
+                } catch {
+                  return { valid: false, message: 'Format d\'URL invalide' }
+                }
+              }}
             />
             {postImageUrl && (
               <div style={{ marginTop: '1rem' }}>
@@ -439,10 +449,17 @@ function ChallengesTab() {
           <h4 style={{ marginBottom: '1rem' }}>Create Challenge</h4>
           <form onSubmit={handleCreate} className="form">
             <Input
-              label="Challenge Name *"
+              label="Nom du défi"
+              icon="🏆"
               value={formData.name}
               onChange={(e) => setFormData({ ...formData, name: e.target.value })}
               required
+              validation={(value) => {
+                if (!value || value.trim().length < 3) {
+                  return { valid: false, message: 'Le nom doit contenir au moins 3 caractères' }
+                }
+                return { valid: true, message: 'Nom valide' }
+              }}
             />
             <label>
               Description
@@ -464,14 +481,16 @@ function ChallengesTab() {
             </label>
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '1rem' }}>
               <Input
-                label="Start Date *"
+                label="Date de début"
+                icon="📅"
                 type="date"
                 value={formData.start_date}
                 onChange={(e) => setFormData({ ...formData, start_date: e.target.value })}
                 required
               />
               <Input
-                label="End Date *"
+                label="Date de fin"
+                icon="📅"
                 type="date"
                 value={formData.end_date}
                 onChange={(e) => setFormData({ ...formData, end_date: e.target.value })}
@@ -480,6 +499,7 @@ function ChallengesTab() {
             </div>
             <Input
               label="Emoji"
+              icon="😊"
               value={formData.emoji}
               onChange={(e) => setFormData({ ...formData, emoji: e.target.value })}
               placeholder="💪"
@@ -609,10 +629,17 @@ function GroupsTab() {
           <h4 style={{ marginBottom: '1rem' }}>Create Group</h4>
           <form onSubmit={handleCreate} className="form">
             <Input
-              label="Group Name *"
+              label="Nom du groupe"
+              icon="👥"
               value={formData.name}
               onChange={(e) => setFormData({ ...formData, name: e.target.value })}
               required
+              validation={(value) => {
+                if (!value || value.trim().length < 3) {
+                  return { valid: false, message: 'Le nom doit contenir au moins 3 caractères' }
+                }
+                return { valid: true, message: 'Nom valide' }
+              }}
             />
             <label>
               Description
@@ -633,11 +660,21 @@ function GroupsTab() {
               />
             </label>
             <Input
-              label="Image URL"
+              label="URL de l'image"
+              icon="🖼️"
               type="url"
               value={formData.image_url}
               onChange={(e) => setFormData({ ...formData, image_url: e.target.value })}
               placeholder="https://example.com/image.jpg"
+              validation={(value) => {
+                if (!value) return null
+                try {
+                  new URL(value)
+                  return { valid: true, message: 'URL valide' }
+                } catch {
+                  return { valid: false, message: 'Format d\'URL invalide' }
+                }
+              }}
             />
             <Button type="submit" style={{ marginTop: '0.5rem' }}>
               ✓ Create Group

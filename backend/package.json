@@ -5,8 +5,10 @@
   "type": "module",
   "scripts": {
     "db:setup": "node ./src/db/setup.js",
+    "db:migrate": "node ./src/db/runMigration.js",
     "start": "node src/server.js",
-    "dev": "nodemon src/server.js"
+    "dev": "nodemon src/server.js",
+    "deploy": "npm run db:setup && npm start"
   },
   "dependencies": {
     "bcrypt": "^5.1.1",
