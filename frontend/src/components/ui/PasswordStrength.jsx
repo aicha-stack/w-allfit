@@ -1,4 +1,5 @@
 import { useMemo } from 'react'
+import Icon from './Icon.jsx'
 
 export default function PasswordStrength({ password }) {
   const strength = useMemo(() => {
@@ -88,7 +89,7 @@ export default function PasswordStrength({ password }) {
           alignItems: 'center',
           gap: '0.25rem'
         }}>
-          {password.length >= 8 ? '✓' : '○'} 8+ caractères
+          {password.length >= 8 ? <Icon name="check" size={14} color="var(--success)" /> : <Icon name="circle" size={14} color="var(--text-secondary)" />} 8+ caractères
         </span>
         <span style={{ 
           color: /[a-z]/.test(password) && /[A-Z]/.test(password) ? 'var(--success)' : 'var(--text-secondary)',
@@ -96,7 +97,7 @@ export default function PasswordStrength({ password }) {
           alignItems: 'center',
           gap: '0.25rem'
         }}>
-          {/[a-z]/.test(password) && /[A-Z]/.test(password) ? '✓' : '○'} Majuscules & minuscules
+          {/[a-z]/.test(password) && /[A-Z]/.test(password) ? <Icon name="check" size={14} color="var(--success)" /> : <Icon name="circle" size={14} color="var(--text-secondary)" />} Majuscules & minuscules
         </span>
         <span style={{ 
           color: /[0-9]/.test(password) ? 'var(--success)' : 'var(--text-secondary)',
@@ -104,7 +105,7 @@ export default function PasswordStrength({ password }) {
           alignItems: 'center',
           gap: '0.25rem'
         }}>
-          {/[0-9]/.test(password) ? '✓' : '○'} Chiffres
+          {/[0-9]/.test(password) ? <Icon name="check" size={14} color="var(--success)" /> : <Icon name="circle" size={14} color="var(--text-secondary)" />} Chiffres
         </span>
         <span style={{ 
           color: /[^A-Za-z0-9]/.test(password) ? 'var(--success)' : 'var(--text-secondary)',
@@ -112,7 +113,7 @@ export default function PasswordStrength({ password }) {
           alignItems: 'center',
           gap: '0.25rem'
         }}>
-          {/[^A-Za-z0-9]/.test(password) ? '✓' : '○'} Caractères spéciaux
+          {/[^A-Za-z0-9]/.test(password) ? <Icon name="check" size={14} color="var(--success)" /> : <Icon name="circle" size={14} color="var(--text-secondary)" />} Caractères spéciaux
         </span>
       </div>
     </div>

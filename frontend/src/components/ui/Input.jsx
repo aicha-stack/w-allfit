@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from 'react'
+import Icon from './Icon.jsx'
 
 export default function Input({ 
   label, 
@@ -135,10 +136,12 @@ export default function Input({
             right: '1rem',
             pointerEvents: 'none',
             color: 'var(--success)',
-            fontSize: '1.1rem',
-            animation: 'fadeIn 0.3s ease'
+            animation: 'fadeIn 0.3s ease',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center'
           }}>
-            ✓
+            <Icon name="check" size={18} color="var(--success)" />
           </div>
         )}
 
@@ -148,10 +151,12 @@ export default function Input({
             right: '1rem',
             pointerEvents: 'none',
             color: '#ef4444',
-            fontSize: '1.1rem',
-            animation: 'fadeIn 0.3s ease'
+            animation: 'fadeIn 0.3s ease',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center'
           }}>
-            ✕
+            <Icon name="close" size={18} color="#ef4444" />
           </div>
         )}
 
@@ -186,7 +191,7 @@ export default function Input({
             }}
             aria-label={showPassword ? 'Hide password' : 'Show password'}
           >
-            {showPassword ? '👁️' : '👁️‍🗨️'}
+            <Icon name="eye" size={18} color="currentColor" />
           </button>
         )}
       </div>
@@ -202,7 +207,7 @@ export default function Input({
           gap: '0.5rem',
           animation: 'fadeIn 0.3s ease'
         }}>
-          <span>⚠️</span>
+          <Icon name="warning" size={16} color="#ef4444" />
           <span>{error || validationMessage || 'Ce champ contient une erreur'}</span>
         </div>
       )}
@@ -230,7 +235,7 @@ export default function Input({
           gap: '0.5rem',
           animation: 'fadeIn 0.3s ease'
         }}>
-          <span>✓</span>
+          <Icon name="check" size={16} color="var(--success)" />
           <span>{validationMessage}</span>
         </div>
       )}

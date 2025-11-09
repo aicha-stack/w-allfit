@@ -6,6 +6,7 @@ import Button from './ui/Button.jsx'
 import Input from './ui/Input.jsx'
 import ProgramImage from './ui/ProgramImage.jsx'
 import RecipeModal from './ui/RecipeModal.jsx'
+import Icon from './ui/Icon.jsx'
 
 export default function RecipesTab() {
   const { token } = useAuth()
@@ -135,26 +136,60 @@ export default function RecipesTab() {
     <div>
       {/* Network error message */}
       {recipes.length === 0 && !loading && (
-        <div style={{ 
-          padding: '1rem', 
-          background: '#fff3cd', 
-          border: '1px solid #ffc107', 
-          borderRadius: '8px', 
-          marginBottom: '1rem',
-          color: '#856404'
+        <Card style={{ 
+          marginBottom: '1.5rem',
+          background: 'var(--card-soft)',
+          border: '1.5px solid rgba(239, 68, 68, 0.3)',
+          borderRadius: '12px'
         }}>
-          <strong>⚠️ Connection Issue:</strong> If you see "Network error", make sure:
-          <ul style={{ margin: '0.5rem 0 0 1.5rem', padding: 0 }}>
-            <li>The backend server is running (check terminal where you started it)</li>
-            <li>The API URL is correct: <code>{API_URL}</code></li>
-            <li>Check browser console (F12) for more details</li>
-          </ul>
-        </div>
+          <div style={{ display: 'flex', alignItems: 'flex-start', gap: '0.75rem' }}>
+            <Icon name="warning" size={24} color="#ef4444" />
+            <div style={{ flex: 1 }}>
+              <strong style={{ display: 'block', marginBottom: '0.5rem', color: 'var(--fg)' }}>
+                Connection Issue
+              </strong>
+              <p style={{ margin: '0 0 0.75rem 0', color: 'var(--text-secondary)', fontSize: '0.9rem' }}>
+                If you see "Network error", make sure:
+              </p>
+              <ul style={{ 
+                margin: '0', 
+                paddingLeft: '1.5rem', 
+                color: 'var(--text-secondary)',
+                fontSize: '0.9rem',
+                lineHeight: '1.8'
+              }}>
+                <li>The backend server is running (check terminal where you started it)</li>
+                <li>The API URL is correct: <code style={{ 
+                  background: 'rgba(168, 85, 247, 0.15)', 
+                  padding: '0.2rem 0.4rem', 
+                  borderRadius: '4px',
+                  fontSize: '0.85rem',
+                  color: 'var(--brand)',
+                  fontFamily: 'monospace'
+                }}>{API_URL}</code></li>
+                <li>Check browser console (F12) for more details</li>
+              </ul>
+            </div>
+          </div>
+        </Card>
       )}
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
-        <h3>🍽️ Healthy Recipes</h3>
-        <Button onClick={() => setShowAddForm(!showAddForm)} style={{ fontSize: '0.875rem' }}>
-          {showAddForm ? '✕ Cancel' : '+ Add Recipe'}
+        <h3 style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+          <Icon name="food" size={24} color="var(--brand)" />
+          Healthy Recipes
+        </h3>
+        <Button onClick={() => setShowAddForm(!showAddForm)} style={{ fontSize: '0.875rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+          {showAddForm ? (
+            <>
+              <Icon name="close" size={16} color="white" />
+              Cancel
+            </>
+          ) : (
+            <>
+              <Icon name="plus" size={16} color="white" />
+              Add Recipe
+            </>
+          )}
         </Button>
       </div>
 
@@ -164,7 +199,7 @@ export default function RecipesTab() {
           <form onSubmit={handleSubmit} className="form">
             <Input
               label="Titre de la recette"
-              icon="🍽️"
+              icon={<Icon name="food" size={18} />}
               value={formData.title}
               onChange={(e) => setFormData({ ...formData, title: e.target.value })}
               required
@@ -195,7 +230,7 @@ export default function RecipesTab() {
             </label>
             <Input
               label="URL de l'image"
-              icon="🖼️"
+              icon={<Icon name="image" size={18} />}
               type="url"
               value={formData.image_url}
               onChange={(e) => setFormData({ ...formData, image_url: e.target.value })}
@@ -231,7 +266,7 @@ export default function RecipesTab() {
               />
               <Input
                 label="Temps de préparation (min)"
-                icon="⏱️"
+                icon={<Icon name="clock" size={18} />}
                 type="number"
                 value={formData.prep_time}
                 onChange={(e) => setFormData({ ...formData, prep_time: e.target.value })}
@@ -283,7 +318,7 @@ export default function RecipesTab() {
               />
               <Input
                 label="Portions"
-                icon="🍽️"
+                icon={<Icon name="food" size={18} />}
                 type="number"
                 value={formData.servings}
                 onChange={(e) => setFormData({ ...formData, servings: e.target.value })}
@@ -337,13 +372,14 @@ export default function RecipesTab() {
             </label>
             <Input
               label="Tags (séparés par des virgules)"
-              icon="🏷️"
+              icon={<Icon name="tag" size={18} />}
               value={formData.tags}
               onChange={(e) => setFormData({ ...formData, tags: e.target.value })}
               placeholder="breakfast, vegan, healthy"
             />
-            <Button type="submit" style={{ marginTop: '0.5rem' }}>
-              ✓ Create Recipe
+            <Button type="submit" style={{ marginTop: '0.5rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+              <Icon name="check" size={18} color="white" />
+              Create Recipe
             </Button>
           </form>
         </Card>
@@ -368,10 +404,9 @@ export default function RecipesTab() {
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
-                  fontSize: '4rem',
                   marginBottom: '1rem'
                 }}>
-                  🍽️
+                  <Icon name="food" size={64} color="var(--brand)" />
                 </div>
               )}
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'start', marginBottom: '0.5rem' }}>
@@ -418,10 +453,22 @@ export default function RecipesTab() {
                 </p>
               )}
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '0.5rem', marginBottom: '0.75rem' }}>
-                <small style={{ color: 'var(--text-secondary)' }}>🔥 {recipe.calories || 0} Cal</small>
-                <small style={{ color: 'var(--text-secondary)' }}>⏱️ {recipe.prep_time || 0} min</small>
-                <small style={{ color: 'var(--text-secondary)' }}>🥩 {recipe.protein_g || 0}g</small>
-                <small style={{ color: 'var(--text-secondary)' }}>🍞 {recipe.carbs_g || 0}g</small>
+                <small style={{ color: 'var(--text-secondary)', display: 'flex', alignItems: 'center', gap: '0.25rem' }}>
+                  <Icon name="chart" size={14} color="var(--text-secondary)" />
+                  {recipe.calories || 0} Cal
+                </small>
+                <small style={{ color: 'var(--text-secondary)', display: 'flex', alignItems: 'center', gap: '0.25rem' }}>
+                  <Icon name="clock" size={14} color="var(--text-secondary)" />
+                  {recipe.prep_time || 0} min
+                </small>
+                <small style={{ color: 'var(--text-secondary)', display: 'flex', alignItems: 'center', gap: '0.25rem' }}>
+                  <Icon name="fitness" size={14} color="var(--text-secondary)" />
+                  {recipe.protein_g || 0}g
+                </small>
+                <small style={{ color: 'var(--text-secondary)', display: 'flex', alignItems: 'center', gap: '0.25rem' }}>
+                  <Icon name="food" size={14} color="var(--text-secondary)" />
+                  {recipe.carbs_g || 0}g
+                </small>
               </div>
               {recipe.tags && recipe.tags.length > 0 && (
                 <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap', marginBottom: '0.75rem' }}>
@@ -441,13 +488,14 @@ export default function RecipesTab() {
               )}
               <div style={{ display: 'flex', gap: '0.5rem' }}>
                 <Button 
-                  style={{ flex: '1', fontSize: '0.875rem' }}
+                  style={{ flex: '1', fontSize: '0.875rem', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem' }}
                   onClick={() => {
                     setSelectedRecipeId(recipe.id)
                     setIsModalOpen(true)
                   }}
                 >
-                  👁️ Voir la recette
+                  <Icon name="eye" size={16} color="white" />
+                  Voir la recette
                 </Button>
                 {recipe.user_id && (
                   <button
@@ -464,7 +512,10 @@ export default function RecipesTab() {
                       fontWeight: '600',
                       transition: 'all 0.2s ease',
                       flex: '0 0 auto',
-                      opacity: deletingId === recipe.id ? 0.6 : 1
+                      opacity: deletingId === recipe.id ? 0.6 : 1,
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center'
                     }}
                     onMouseEnter={(e) => {
                       if (deletingId !== recipe.id) {
@@ -480,7 +531,11 @@ export default function RecipesTab() {
                     }}
                     title={deletingId === recipe.id ? 'Deleting...' : 'Delete this recipe'}
                   >
-                    {deletingId === recipe.id ? '⏳' : '🗑️'}
+                    {deletingId === recipe.id ? (
+                      <Icon name="loading" size={18} color="currentColor" />
+                    ) : (
+                      <Icon name="trash" size={18} color="currentColor" />
+                    )}
                   </button>
                 )}
               </div>
@@ -489,7 +544,9 @@ export default function RecipesTab() {
         </div>
       ) : (
         <Card style={{ textAlign: 'center', padding: '3rem 2rem', background: 'var(--card-soft)' }}>
-          <div style={{ fontSize: '4rem', marginBottom: '1rem' }}>🍽️</div>
+          <div style={{ marginBottom: '1rem', display: 'flex', justifyContent: 'center' }}>
+            <Icon name="food" size={64} color="var(--brand)" />
+          </div>
           <p style={{ color: 'var(--text-secondary)' }}>No recipes yet. Create your first recipe!</p>
         </Card>
       )}

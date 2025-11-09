@@ -1,5 +1,6 @@
 import { Routes, Route, Navigate } from 'react-router-dom'
 import Navbar from './components/Navbar.jsx'
+import Footer from './components/Footer.jsx'
 import Login from './pages/Login.jsx'
 import Register from './pages/Register.jsx'
 import Programs from './pages/Programs.jsx'
@@ -34,6 +35,7 @@ export default function App() {
           <Route path="*" element={<NotFound />} />
         </Routes>
       </div>
+      <Footer />
     </AuthProvider>
   )
 }

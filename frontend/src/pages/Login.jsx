@@ -5,6 +5,7 @@ import { API_URL, useAuth } from '../hooks/useAuth.jsx'
 import Button from '../components/ui/Button.jsx'
 import Input from '../components/ui/Input.jsx'
 import Card from '../components/ui/Card.jsx'
+import Icon from '../components/ui/Icon.jsx'
 
 export default function Login() {
   const [email, setEmail] = useState('')
@@ -58,9 +59,10 @@ export default function Login() {
         border: '2px solid rgba(168,85,247,0.2)'
       }}>
         <div style={{ textAlign: 'center', marginBottom: '2rem' }}>
-          <div className="emoji-large" style={{ marginBottom: '1rem' }}>💜</div>
+          <div style={{ marginBottom: '1rem', display: 'flex', justifyContent: 'center' }}>
+            <Icon name="heart" size={64} color="var(--brand)" />
+          </div>
           <h1 style={{ marginBottom: '0.5rem' }}>
-            <span className="emoji">👋</span>
             Welcome Back!
           </h1>
           <p style={{ color: 'var(--text-secondary)', fontSize: '0.95rem' }}>
@@ -75,7 +77,7 @@ export default function Login() {
             borderRadius: '12px'
           }}>
             <div style={{ display: 'flex', alignItems: 'flex-start', gap: '0.75rem' }}>
-              <span className="emoji" style={{ fontSize: '1.5rem' }}>⚠️</span>
+              <Icon name="warning" size={24} color="currentColor" />
               <div style={{ flex: 1 }}>
                 <strong style={{ display: 'block', marginBottom: '0.5rem' }}>
                   Backend Server Not Reachable
@@ -111,13 +113,13 @@ export default function Login() {
               gap: '0.5rem',
               marginBottom: '1rem'
             }}>
-              <span className="emoji">⚠️</span>
+              <Icon name="warning" size={18} color="currentColor" />
               <span>{error}</span>
             </div>
           )}
           <Input 
             label="Email"
-            icon="📧"
+            icon={<Icon name="email" size={18} />}
             value={email} 
             onChange={(e)=>setEmail(e.target.value)} 
             type="email" 
@@ -135,7 +137,7 @@ export default function Login() {
           />
           <Input 
             label="Mot de passe"
-            icon="🔒"
+            icon={<Icon name="lock" size={18} />}
             value={password} 
             onChange={(e)=>setPassword(e.target.value)} 
             type="password" 
@@ -144,8 +146,9 @@ export default function Login() {
             showPasswordToggle={true}
             error={error && error.toLowerCase().includes('password') ? error : null}
           />
-          <Button type="submit" style={{ width: '100%', marginTop: '0.5rem' }}>
-            <span className="emoji">🚀</span> Sign In
+          <Button type="submit" style={{ width: '100%', marginTop: '0.5rem', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem' }}>
+            <Icon name="star" size={18} color="white" />
+            Sign In
           </Button>
         </form>
         
@@ -180,7 +183,7 @@ export default function Login() {
             onMouseEnter={(e) => e.target.style.transform = 'translateX(4px)'}
             onMouseLeave={(e) => e.target.style.transform = 'translateX(0)'}
           >
-            <span className="emoji">✨</span>
+            <Icon name="star" size={16} color="var(--brand)" />
             Create Account
           </Link>
         </div>
